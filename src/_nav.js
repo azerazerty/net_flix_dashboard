@@ -29,66 +29,12 @@ const _nav = [
   },
   {
     component: CNavTitle,
-    name: 'SIM',
+    name: 'MEMBERSHIPS',
   },
   {
     component: CNavItem,
-    name: 'Manage SIM Numbers',
-    to: '/manage-sim',
-    icon: <CIcon icon={cilSim} customClassName="nav-icon" />,
-  },
-
-  {
-    component: CNavTitle,
-    name: 'USERS',
-  },
-  {
-    component: CNavItem,
-    name: 'Manage Users',
-    to: '/manage-users',
-    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
-  },
-  // {
-  //   component: CNavItem,
-  //   name: 'Manage Admins',
-  //   to: '/manage-admins',
-  //   icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
-  //   badge: {
-  //     text: 'Master',
-  //     color: 'danger',
-  //   },
-  // },
-  {
-    component: CNavTitle,
-    name: 'OPERATIONS',
-  },
-  {
-    component: CNavItem,
-    name: 'Users Operations',
-    to: '/users-operations',
-    icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Admin Operations',
-    to: '/admin-operations',
-    icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Total Flexy',
-    to: '/total-flexy',
-    icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
-  },
-
-  {
-    component: CNavTitle,
-    name: 'PAYMENT',
-  },
-  {
-    component: CNavItem,
-    name: 'Invoices',
-    to: '/invoices',
+    name: 'Netflix Memberships',
+    to: '/netflix-memberships',
     icon: <CIcon icon={cilSpreadsheet} customClassName="nav-icon" />,
   },
 ]
@@ -101,66 +47,12 @@ const _admin_nav = [
   },
   {
     component: CNavTitle,
-    name: 'SIM',
+    name: 'MEMBERSHIPS',
   },
   {
     component: CNavItem,
-    name: 'Manage SIM Numbers',
-    to: '/manage-sim',
-    icon: <CIcon icon={cilSim} customClassName="nav-icon" />,
-  },
-
-  {
-    component: CNavTitle,
-    name: 'USERS',
-  },
-  {
-    component: CNavItem,
-    name: 'Manage Users',
-    to: '/manage-users',
-    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Manage Admins',
-    to: '/manage-admins',
-    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
-    badge: {
-      text: 'Master',
-      color: 'danger',
-    },
-  },
-  {
-    component: CNavTitle,
-    name: 'OPERATIONS',
-  },
-  {
-    component: CNavItem,
-    name: 'Users Operations',
-    to: '/users-operations',
-    icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Admin Operations',
-    to: '/admin-operations',
-    icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Total Flexy',
-    to: '/total-flexy',
-    icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
-  },
-
-  {
-    component: CNavTitle,
-    name: 'PAYMENT',
-  },
-  {
-    component: CNavItem,
-    name: 'Invoices',
-    to: '/invoices',
+    name: 'Netflix Memberships',
+    to: '/netflix-memberships',
     icon: <CIcon icon={cilSpreadsheet} customClassName="nav-icon" />,
   },
 ]

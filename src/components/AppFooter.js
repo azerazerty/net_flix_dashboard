@@ -7,8 +7,8 @@ const AppFooter = () => {
   return (
     <CFooter className="px-4">
       <div>
-        <a href="https://www.ich7en.com/" target="_blank" rel="noopener noreferrer">
-          Ich7en
+        <a href="#" target="_blank" rel="noopener noreferrer">
+          Ferhat Netflix
         </a>
         <span className="ms-1">&copy; {`${new Date().getFullYear()}`}</span>
       </div>

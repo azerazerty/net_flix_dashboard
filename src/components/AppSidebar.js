@@ -54,7 +54,7 @@ const AppSidebar = () => {
           {` `}
           {!unfoldable && (
             <span className=" text-decoration-none fs-2 fw-bold">
-              Ich<span className=" text-decoration-none text-primary">7en</span>
+              NET<span className=" text-decoration-none text-danger">FLIX</span>
             </span>
           )}
           {/* <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} /> */}

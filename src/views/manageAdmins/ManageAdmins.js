@@ -5,7 +5,7 @@ import {
   cilPlus,
   cilReload,
   cilTrash,
-  cilUserFollow,
+  cilNoteAdd,
   cilZoom,
 } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
@@ -34,6 +34,7 @@ import {
   CFormSelect,
   CFormCheck,
   CButtonGroup,
+  CDateRangePicker,
 } from '@coreui/react-pro'
 import { useEffect, useRef, useState } from 'react'
 
@@ -42,17 +43,15 @@ import {
   useCreateUserMutation,
   useDeleteUserMutation,
   useEditUserMutation,
-  usePayUserMutation,
-  useGenerateApiMutation,
 } from '../../Redux/features/Admins/adminsApi'
-import { useGetNumbersQuery } from '../../Redux/features/Sim/SimApi'
 
 import { getCurrentUser } from '../../Redux/features/Auth/authSlice'
 import { useSelector } from 'react-redux'
 
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import CopyToClipboard from '../../components/CopyToClipboard'
+import { CFormSwitch } from '@coreui/react'
+import { format } from 'date-fns'
 
 const MySwal = withReactContent(Swal)
 
@@ -65,14 +64,11 @@ const ManageAdmins = () => {
   const [CreateUser, createUserResult] = useCreateUserMutation()
   const [EditUser, editUserResult] = useEditUserMutation()
   const [DeleteUser, deleteUserResult] = useDeleteUserMutation()
-  const [GenerateApi, generateApiResult] = useGenerateApiMutation()
 
   const [showInfoModel, setShowInfoModel] = useState(false)
   const [showCreateModel, setShowCreateModel] = useState(false)
 
   const [toast, addToast] = useState(0)
-  const [newNumber, setNewNumber] = useState('')
-  const [newIp, setNewIp] = useState('')
 
   const [selectedUser, setSelectedUser] = useState()
   const [newUser, setNewUser] = useState()
@@ -91,16 +87,29 @@ const ManageAdmins = () => {
       key: 'id',
     },
     {
-      key: 'user',
-      label: 'Username',
+      key: 'email',
+      label: 'Email',
+      _style: { width: '20%', whiteSpace: 'nowrap' },
     },
     {
-      key: 'api_key',
-      label: 'Api Key',
+      key: 'start_date',
+      label: 'Start Date',
+      _style: { width: '20%', whiteSpace: 'nowrap' },
     },
     {
-      key: 'has_freefire',
-      label: 'Has FreeFire',
+      key: 'end_date',
+      label: 'End Date',
+      _style: { width: '20%', whiteSpace: 'nowrap' },
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      _style: { width: '10%', whiteSpace: 'nowrap' },
+    },
+    {
+      key: 'membership',
+      label: 'Membership',
+      _style: { width: '30%', whiteSpace: 'nowrap' },
     },
     {
       key: 'action',
@@ -109,7 +118,42 @@ const ManageAdmins = () => {
       sorter: false,
     },
   ]
-  const UsersTableData = UsersData?.users || null
+  // const rows = [
+  //   {
+  //     id: 1,
+  //     email: 'test@test.com',
+  //     membership: '1 Year Subscription',
+  //     start_date: '01-02-2024',
+  //     end_date: '01-02-2025',
+  //     status: 'active',
+  //   },
+  //   {
+  //     id: 2,
+  //     email: 'test@test.com',
+  //     membership: '1 Year Subscription',
+  //     start_date: '01-02-2024',
+  //     end_date: '01-02-2025',
+  //     status: 'active',
+  //   },
+  //   {
+  //     id: 3,
+  //     email: 'test@test.com',
+  //     membership: '1 Year Subscription',
+  //     start_date: '01-02-2024',
+  //     end_date: '01-02-2025',
+  //     status: 'expired',
+  //   },
+  //   {
+  //     id: 4,
+  //     email: 'test@test.com',
+  //     membership: '1 Year Subscription',
+  //     start_date: '01-02-2024',
+  //     end_date: '01-02-2025',
+  //     status: 'active',
+  //   },
+  // ]
+
+  const UsersTableData = UsersData?.subscriptions || null
 
   const successToast = (successMessage) => (
     <CToast
@@ -132,6 +176,16 @@ const ManageAdmins = () => {
       </div>
     </CToast>
   )
+  const getBadge = (status) => {
+    switch (status) {
+      case 'active':
+        return 'success'
+      case 'expired':
+        return 'danger'
+      default:
+        return 'primary'
+    }
+  }
 
   const handleCreateUser = async (e) => {
     e.preventDefault()
@@ -146,12 +200,12 @@ const ManageAdmins = () => {
         throw new Error(data.message)
       }
       setShowCreateModel(false)
-      addToast(successToast('User Created Successfully.'))
+      addToast(successToast('Membership Created Successfully.'))
     } catch (error) {
       let errorMsg = ''
       error?.message
         ? (errorMsg = error.message)
-        : (errorMsg = 'Error While Creating User, Please Try Again Later.')
+        : (errorMsg = 'Error While Creating Membership, Please Try Again Later.')
       addToast(failedToast(`${errorMsg}`))
     }
   }
@@ -168,12 +222,12 @@ const ManageAdmins = () => {
         throw new Error(data.message)
       }
       setShowInfoModel(false)
-      addToast(successToast('User Updated Successfully.'))
+      addToast(successToast('Membership Updated Successfully.'))
     } catch (error) {
       let errorMsg = ''
       error?.message
         ? (errorMsg = error.message)
-        : (errorMsg = 'Error While Updating User, Please Try Again Later.')
+        : (errorMsg = 'Error While Updating Membership, Please Try Again Later.')
       addToast(failedToast(`${errorMsg}`))
     }
   }
@@ -205,40 +259,7 @@ const ManageAdmins = () => {
         setShowInfoModel(false)
         MySwal.fire({
           title: 'Deleted!',
-          text: 'User has been deleted.',
-          icon: 'success',
-        })
-      }
-    })
-  }
-  const handleGenerateAPI = (user) => {
-    MySwal.fire({
-      title: 'Are you sure?',
-      text: 'You Are About to Regenerate the API key!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, Regenerate!',
-      showLoaderOnConfirm: true,
-      preConfirm: async () => {
-        try {
-          await generateAPI(user)
-        } catch (e) {
-          MySwal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Something went wrong!',
-          })
-          throw e
-        }
-      },
-      allowOutsideClick: () => !MySwal.isLoading(),
-    }).then((result) => {
-      if (result.isConfirmed) {
-        MySwal.fire({
-          title: 'Regenerated!',
-          text: 'API key has been regenerated.',
+          text: 'Membership has been deleted.',
           icon: 'success',
         })
       }
@@ -249,7 +270,7 @@ const ManageAdmins = () => {
     try {
       const data = await DeleteUser({
         credentials: user,
-        User: { delete_username: User.edit_username },
+        User: { email: User.email },
       }).unwrap()
 
       if (data.status !== 'success') {
@@ -257,68 +278,63 @@ const ManageAdmins = () => {
         throw new Error(data.message)
       }
 
-      addToast(successToast('User Deleted Successfully.'))
+      addToast(successToast('Membership Deleted Successfully.'))
       toReturn = data
     } catch (error) {
-      let errorMsg = error?.message || 'Error While Deleting User, Please Try Again Later.'
-      addToast(failedToast(`${errorMsg}`))
-      throw error // Re-throw the original error instead of creating a new one
-    }
-    return toReturn
-  }
-  const generateAPI = async (User) => {
-    let toReturn
-    try {
-      const data = await GenerateApi({
-        credentials: user,
-        User: { edit_username: User.edit_username },
-      }).unwrap()
-
-      if (data.status !== 'success') {
-        addToast(failedToast(data.message))
-        throw new Error(data.message)
-      }
-
-      addToast(successToast('API key Regenerated Successfully.'))
-      toReturn = data
-    } catch (error) {
-      let errorMsg = error?.message || 'Error While Regenerating API Key, Please Try Again Later.'
+      let errorMsg = error?.message || 'Error While Deleting Membership, Please Try Again Later.'
       addToast(failedToast(`${errorMsg}`))
       throw error // Re-throw the original error instead of creating a new one
     }
     return toReturn
   }
   useEffect(() => {
-    const fetchFFusers = () => {
-      fetch('https://fftopup.store/Flexy/getffusers.php', {
-        body: JSON.stringify({
-          ...user,
-        }),
-        method: 'POST',
-      })
-        .then(async (r) => await r.json())
-        .then((response) => {
-          if (response.users.length > 0) {
-            let to_return = []
-            response.users.map((user) => {
-              to_return.push(user.user)
-            })
-            setFfusers(to_return)
-            console.log(to_return)
-            console.log(to_return[Object.keys(to_return)[0]] || 'not found')
+    // const fetchFFusers = () => {
+    //   fetch('https://fftopup.store/Flexy/getffusers.php', {
+    //     body: JSON.stringify({
+    //       ...user,
+    //     }),
+    //     method: 'POST',
+    //   })
+    //     .then(async (r) => await r.json())
+    //     .then((response) => {
+    //       if (response.users.length > 0) {
+    //         let to_return = []
+    //         response.users.map((user) => {
+    //           to_return.push(user.user)
+    //         })
+    //         setFfusers(to_return)
+    //         console.log(to_return)
+    //         console.log(to_return[Object.keys(to_return)[0]] || 'not found')
+    //         setFfusers(to_return)
+    //       } else {
+    //         setFfusers(response.users)
+    //       }
+    //     })
+    //     .catch((e) => {
+    //       //show toast
+    //       setFfusers(null)
+    //     })
+    // }
+    // fetchFFusers()
 
-            setFfusers(to_return)
-          } else {
-            setFfusers(response.users)
-          }
-        })
-        .catch((e) => {
-          //show toast
-          setFfusers(null)
-        })
-    }
-
-    fetchFFusers()
+    setFfusers([
+      {
+        id: 0,
+        plan: '1 Month Subscription',
+      },
+      {
+        id: 1,
+        plan: '3 Months Subscription',
+      },
+      {
+        id: 2,
+        plan: '6 Months Subscription',
+      },
+      {
+        id: 3,
+        plan: '1 Year Subscription',
+      },
+    ])
   }, [])
 
   return (
@@ -327,113 +343,83 @@ const ManageAdmins = () => {
 
       <CModal visible={showInfoModel} onClose={() => setShowInfoModel(false)}>
         <CModalHeader>
-          <CModalTitle>Admin Details</CModalTitle>
+          <CModalTitle>Membership Details</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CForm noValidate>
             <CFormInput
               className="mb-3"
-              id="username"
-              placeholder="Username"
-              label="Username"
-              value={selectedUser?.edit_username || ''}
+              id="email"
+              placeholder="Email"
+              label="Email"
+              value={selectedUser?.email || ''}
               disabled
               readOnly
             />
-            <CFormInput
+            <CFormSelect
+              defaultValue={selectedUser?.membership}
               onChange={(e) =>
                 setSelectedUser((prev) => {
                   return {
                     ...prev,
-                    new_password: `${e.target.value}`,
+                    membership: `${e.target.value}`,
                   }
                 })
               }
               className="mb-3"
-              id="password"
-              placeholder="Password"
-              label="Password"
-              value={selectedUser?.new_password || ''}
+              id="plan"
+              label="Membership Plan"
               required
-            />
-            {/* <CFormSelect
-              defaultValue={selectedUser?.new_phone_number}
-              onChange={(e) =>
-                setSelectedUser((prev) => {
-                  return {
-                    ...prev,
-                    phone_number: `${e.target.value}`,
-                  }
-                })
-              }
-              className="mb-3"
-              id="phone_number"
-              label="Phone Number"
-              required
-              aria-label="Select Number"
+              aria-label="plan"
             >
-              <option disabled>Select Number</option>
+              <option disabled>Select Plan</option>
               {ffusers &&
                 ffusers.length > 0 &&
                 ffusers?.map((item, i) => (
-                  <option key={i} value={item.user}>
-                    {item.user}
+                  <option key={i} value={item.id}>
+                    {item.plan}
                   </option>
                 ))}
-            </CFormSelect> */}
+            </CFormSelect>
             <CRow className=" mb-3">
-              <CCol className="d-flex flex-column justify-content-center ">
-                <CFormCheck
+              <CCol xs lg={4} className="d-flex flex-column justify-content-center mb-3 mb-lg-0">
+                <CFormSwitch
                   onChange={(e) =>
                     setSelectedUser((prev) => {
                       return {
                         ...prev,
-                        has_freefire: selectedUser?.has_freefire === 'yes' ? 'no' : 'yes',
-                        ffuser:
-                          selectedUser?.has_freefire === 'yes'
-                            ? null
-                            : selectedUser?.ffuser || (ffusers && ffusers[0]?.user) || null,
+                        status: selectedUser?.status === 'active' ? 'expired' : 'active',
                       }
                     })
                   }
-                  id="has_freefire"
-                  label="Admin Has FreeFire"
-                  defaultChecked={selectedUser?.has_freefire === 'yes'}
+                  id="status"
+                  label="Membership Active/Expired"
+                  defaultChecked={selectedUser?.status === 'active'}
                 />
               </CCol>
-              <CCol>
-                <CFormSelect
-                  disabled={selectedUser?.has_freefire !== 'yes'}
-                  onChange={(e) =>
+              <CCol xs="auto" lg={8}>
+                <CDateRangePicker
+                  className="mb-3"
+                  disabled={selectedUser?.status === 'expired' || false}
+                  onStartDateChange={(date) =>
                     setSelectedUser((prev) => {
                       return {
                         ...prev,
-                        ffuser: `${e.target.value}`,
+                        start_date: format(date, 'yyyy-MM-dd'),
                       }
                     })
                   }
-                  id="ffuser"
-                  required
-                  aria-label="Select Linked User"
-                  defaultValue={
-                    (ffusers &&
-                      ffusers.length > 0 &&
-                      ffusers.includes(selectedUser?.ffuser) &&
-                      selectedUser?.ffuser) ||
-                    false
+                  onEndDateChange={(date) =>
+                    setSelectedUser((prev) => {
+                      return {
+                        ...prev,
+                        end_date: format(date, 'yyyy-MM-dd'),
+                      }
+                    })
                   }
-                >
-                  <option disabled={selectedUser?.has_freefire === 'yes'}>
-                    Select Linked User
-                  </option>
-                  {ffusers &&
-                    ffusers.length > 0 &&
-                    ffusers.map((item, i) => (
-                      <option key={i} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                </CFormSelect>
+                  endDate={selectedUser?.end_date || ''}
+                  startDate={selectedUser?.start_date || ''}
+                />
               </CCol>
             </CRow>
 
@@ -447,7 +433,7 @@ const ManageAdmins = () => {
                   color="success"
                 >
                   <CIcon icon={cilPencil} height={16}></CIcon>
-                  {` ${editUserResult.isLoading ? 'Loading ...' : 'Edit Admin'}`}
+                  {` ${editUserResult.isLoading ? 'Loading ...' : 'Edit Membership'}`}
                 </CButton>
               </CCol>
               <CCol>
@@ -460,7 +446,7 @@ const ManageAdmins = () => {
                 >
                   <CIcon icon={cilTrash} height={16}></CIcon>
 
-                  {` ${deleteUserResult.isLoading ? 'Loading ...' : 'Delete Admin'}`}
+                  {` ${deleteUserResult.isLoading ? 'Loading ...' : 'Delete Membership'}`}
                 </CButton>
               </CCol>
             </CRow>
@@ -469,7 +455,7 @@ const ManageAdmins = () => {
       </CModal>
       <CModal visible={showCreateModel} onClose={() => setShowCreateModel(false)}>
         <CModalHeader>
-          <CModalTitle>Admin Details</CModalTitle>
+          <CModalTitle>Membership Details</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CForm noValidate onSubmit={handleCreateUser}>
@@ -478,81 +464,64 @@ const ManageAdmins = () => {
                 setSelectedUser((prev) => {
                   return {
                     ...prev,
-                    new_username: `${e.target.value}`,
+                    email: `${e.target.value}`,
                   }
                 })
               }
               className="mb-3"
-              id="username"
-              placeholder="Username"
-              label="Username"
-              value={selectedUser?.new_username || ''}
+              id="email"
+              placeholder="Email"
+              label="Email"
+              value={selectedUser?.email || ''}
             />
-            <CFormInput
+            <CFormSelect
+              defaultValue={selectedUser?.membership}
               onChange={(e) =>
                 setSelectedUser((prev) => {
                   return {
                     ...prev,
-                    new_password: `${e.target.value}`,
+                    membership: `${e.target.value}`,
                   }
                 })
               }
               className="mb-3"
-              id="password"
-              placeholder="Password"
-              label="Password"
-              value={selectedUser?.new_password || ''}
+              id="plan"
+              label="Membership Plan"
               required
-            />
-            <CRow className=" mb-3">
-              <CCol className="d-flex flex-column justify-content-center ">
-                <CFormCheck
-                  onChange={(e) =>
-                    setSelectedUser((prev) => {
-                      return {
-                        ...prev,
-                        has_freefire: selectedUser?.has_freefire === 'yes' ? 'no' : 'yes',
-                        ffuser:
-                          selectedUser?.has_freefire === 'yes'
-                            ? null
-                            : selectedUser?.ffuser || (ffusers && ffusers[0]) || null,
-                      }
-                    })
-                  }
-                  id="has_freefire"
-                  label="Admin Has FreeFire"
-                  defaultChecked={selectedUser?.has_freefire === 'yes'}
-                />
-              </CCol>
-              <CCol>
-                <CFormSelect
-                  disabled={selectedUser?.has_freefire !== 'yes'}
-                  onChange={(e) =>
-                    setSelectedUser((prev) => {
-                      return {
-                        ...prev,
-                        ffuser: `${e.target.value}`,
-                      }
-                    })
-                  }
-                  id="ffuser"
-                  required
-                  aria-label="Select Linked User"
-                  defaultValue={(ffusers && ffusers.length > 0 && ffusers[0]?.user) || null}
-                >
-                  <option disabled={selectedUser?.has_freefire === 'yes'}>
-                    Select Linked User
+              aria-label="plan"
+            >
+              <option disabled>Select Plan</option>
+              {ffusers &&
+                ffusers.length > 0 &&
+                ffusers?.map((item, i) => (
+                  <option key={i} value={item.id}>
+                    {item.plan}
                   </option>
-                  {ffusers &&
-                    ffusers.length > 0 &&
-                    ffusers.map((item, i) => (
-                      <option key={i} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                </CFormSelect>
-              </CCol>
-            </CRow>
+                ))}
+            </CFormSelect>
+            <CDateRangePicker
+              className="mb-3"
+              label="Subscription Period"
+              disabled={selectedUser?.status === 'expired' || false}
+              onStartDateChange={(date) =>
+                setSelectedUser((prev) => {
+                  return {
+                    ...prev,
+                    start_date: format(date, 'yyyy-MM-dd'),
+                  }
+                })
+              }
+              onEndDateChange={(date) =>
+                setSelectedUser((prev) => {
+                  return {
+                    ...prev,
+                    end_date: format(date, 'yyyy-MM-dd'),
+                  }
+                })
+              }
+              endDate={selectedUser?.end_date || ''}
+              startDate={selectedUser?.start_date || ''}
+            />
 
             <CButton
               disabled={createUserResult.isLoading}
@@ -560,8 +529,8 @@ const ManageAdmins = () => {
               type="submit"
               color="primary"
             >
-              <CIcon icon={cilUserFollow} />
-              {`${createUserResult.isLoading ? ' Creating ...' : ' Create Admin'}`}
+              <CIcon icon={cilNoteAdd} />
+              {`${createUserResult.isLoading ? ' Creating ...' : ' Create Membership'}`}
             </CButton>
           </CForm>
         </CModalBody>
@@ -570,22 +539,23 @@ const ManageAdmins = () => {
       {!isLoading && !isError && (
         <>
           <CCard>
-            <CCardHeader>Admins Manager</CCardHeader>
+            <CCardHeader>Memberships Manager</CCardHeader>
             <CCardBody>
               <CButton
                 onClick={() => {
                   setSelectedUser({
-                    has_freefire: 'no',
+                    start_date: format(Date.now(), 'yyyy-MM-dd'),
                     // ffuser: SimData?.data[0]?.number || null,
-                    ffuser: null,
+                    status: 'active',
+                    membership: 0,
                   })
 
                   setShowCreateModel(true)
                 }}
                 color="primary float-end  mx-3"
               >
-                <CIcon icon={cilUserFollow} height={16}></CIcon>
-                {` Create New Admin`}
+                <CIcon icon={cilNoteAdd} height={16}></CIcon>
+                {` Create New Membership`}
               </CButton>
               <CRow className="mt-5">
                 <CCol>
@@ -597,6 +567,7 @@ const ManageAdmins = () => {
                     columnSorter
                     //   footer
                     items={UsersTableData}
+                    // items={rows}
                     itemsPerPageSelect
                     itemsPerPage={10}
                     pagination
@@ -621,13 +592,11 @@ const ManageAdmins = () => {
                             onClick={() => {
                               console.log(item)
                               setSelectedUser({
-                                edit_username: item.user,
-                                new_password: item.password,
-                                // new_percentage: item.percentage,
-                                // new_phone_number: item.phone_number,
-                                has_freefire: item.has_freefire || 'no',
-                                // ffuser: SimData?.data[0]?.number || null,
-                                ffuser: item.ffuser || null,
+                                email: item.email,
+                                membership: item.membership,
+                                start_date: item.start_date,
+                                end_date: item.end_date,
+                                status: item.status,
                               })
                               setShowInfoModel(true)
                             }}
@@ -645,30 +614,14 @@ const ManageAdmins = () => {
                           </CButton>
                         </td>
                       ),
-                      api_key: (item) => (
+                      status: (item) => (
                         <td>
-                          <CRow className="px-1 flex-nowrap" xs={{ gutterX: 2 }}>
-                            <CCol>
-                              <CopyToClipboard className="px-1 flex-nowrap" text={item.api_key} />
-                            </CCol>
-                            <CCol xs={2}>
-                              <CButton
-                                type="button"
-                                variant="outline"
-                                color="primary"
-                                onClick={(e) =>
-                                  handleGenerateAPI({
-                                    edit_username: item.user,
-                                  })
-                                }
-                              >
-                                <CIcon icon={cilReload} />
-                              </CButton>
-                            </CCol>
-                          </CRow>
+                          <CBadge color={getBadge(item.status)}>{item.status.toUpperCase()}</CBadge>
                         </td>
                       ),
-
+                      membership: (item) => (
+                        <td>{ffusers[item.membership].plan || 'Uknown Membership'}</td>
+                      ),
                       // amount_rest_topay: (item) => (
                       //   <td className=" fw-bold px-3">
                       //     <CBadge

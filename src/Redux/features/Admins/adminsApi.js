@@ -2,56 +2,40 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const adminsApi = createApi({
   reducerPath: 'adminsApi',
-  tagTypes: ['ADMINS'],
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://fftopup.store/Flexy/manageadmins.php' }),
+  tagTypes: ['SUBS'],
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://el-riyas.store/netflix/managesub.php' }),
   endpoints: (builder) => ({
     getUsers: builder.query({
       query: (credentials) => ({
         url: '',
         method: 'POST',
-        body: { ...credentials, action: 'get_users' },
+        body: { ...credentials, action: 'get_subscriptions' },
       }),
-      providesTags: ['ADMINS'],
+      providesTags: ['SUBS'],
     }),
     createUser: builder.mutation({
       query: ({ credentials, User }) => ({
         url: '',
         method: 'POST',
-        body: { ...credentials, ...User, action: 'create_user' },
+        body: { ...credentials, ...User, action: 'create_subscription' },
       }),
-      invalidatesTags: ['ADMINS'],
+      invalidatesTags: ['SUBS', 'HOME'],
     }),
     editUser: builder.mutation({
       query: ({ credentials, User }) => ({
         url: '',
         method: 'POST',
-        body: { ...credentials, ...User, action: 'edit_user' },
+        body: { ...credentials, ...User, action: 'edit_subscription' },
       }),
-      invalidatesTags: ['ADMINS'],
+      invalidatesTags: ['SUBS', 'HOME'],
     }),
     deleteUser: builder.mutation({
       query: ({ credentials, User }) => ({
         url: '',
         method: 'POST',
-        body: { ...credentials, delete_username: User.delete_username, action: 'delete_user' },
+        body: { ...credentials, email: User.email, action: 'delete_subscription' },
       }),
-      invalidatesTags: ['ADMINS'],
-    }),
-    payUser: builder.mutation({
-      query: ({ credentials, User }) => ({
-        url: '',
-        method: 'POST',
-        body: { ...credentials, pay_username: User.pay_username, action: 'pay_user' },
-      }),
-      invalidatesTags: ['ADMINS'],
-    }),
-    generateApi: builder.mutation({
-      query: ({ credentials, User }) => ({
-        url: '',
-        method: 'POST',
-        body: { ...credentials, edit_username: User.edit_username, action: 'update_apikey' },
-      }),
-      invalidatesTags: ['ADMINS', 'HOME'],
+      invalidatesTags: ['SUBS', 'HOME'],
     }),
   }),
 })
@@ -60,6 +44,4 @@ export const {
   useCreateUserMutation,
   useEditUserMutation,
   useDeleteUserMutation,
-  usePayUserMutation,
-  useGenerateApiMutation
 } = adminsApi
