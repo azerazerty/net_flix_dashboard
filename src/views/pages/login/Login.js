@@ -58,7 +58,7 @@ const Login = () => {
           <CCol md={6}>
             <CImage className="mb-1" src={logo} height={96} />
             <h3 className={`text-secondary fw-bold `}>
-              ICH7EN <span className="text-primary">ADMIN PANEL</span>{' '}
+              FERHAT NETFLIX <span className="text-primary">ADMIN PANEL</span>{' '}
               <sub className="fs-6 fw-semibold fst-italic text-primary">version 1 .0 .0</sub>
             </h3>
           </CCol>
@@ -140,8 +140,8 @@ const Login = () => {
         </CRow>
         <CFooter className="bg-body-tertiary mt-5 px-4">
           <div>
-            <a href="https://www.ich7en.com/" target="_blank" rel="noopener noreferrer">
-              Ich7en
+            <a href="#" target="_blank" rel="noopener noreferrer">
+              Ferhat Netflix
             </a>
             <span className="ms-1">&copy; {`${new Date().getFullYear()}`}</span>
           </div>
