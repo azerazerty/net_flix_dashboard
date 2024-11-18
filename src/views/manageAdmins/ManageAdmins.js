@@ -532,6 +532,11 @@ const ManageAdmins = () => {
               className="mb-3"
               label="Subscription Period"
               disabled={selectedUser?.status === 'expired' || false}
+              inputDateParse={(date) => {
+                if (date.length !== 10) return
+                return new Date(date)
+              }}
+              inputDateFormat={(date) => format(new Date(date), 'yyyy-MM-dd')}
               onStartDateChange={(date) =>
                 setSelectedUser((prev) => {
                   return {
