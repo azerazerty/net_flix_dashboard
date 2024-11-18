@@ -572,7 +572,7 @@ const ManageAdmins = () => {
                 onClick={() => {
                   setSelectedUser({
                     start_date: format(Date.now(), 'yyyy-MM-dd'),
-                    // ffuser: SimData?.data[0]?.number || null,
+                    end_date: calculateEndDate(1),
                     status: 'active',
                     membership: 0,
                   })
