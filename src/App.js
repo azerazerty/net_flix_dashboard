@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
 //add pro styles
-import '@coreui/coreui-pro/dist/css/coreui.min.css'
+// import '@coreui/coreui-pro/dist/css/coreui.min.css'
 
 import ProtectedRoutes from './components/ProtectedRoutes'
 

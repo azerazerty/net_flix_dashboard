@@ -1,9 +1,9 @@
 // If you want to override variables do it here
-$date-picker-zindex: 50000 !default;
+$date-picker-zindex: 50000;
 @import 'variables';
 
 // Import styles
-@import '@coreui/coreui/scss/coreui';
+@import '@coreui/coreui-pro/scss/coreui';
 @import '@coreui/chartjs/scss/coreui-chartjs';
 
 // Vendors

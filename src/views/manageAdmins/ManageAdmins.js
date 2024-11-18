@@ -415,7 +415,11 @@ const ManageAdmins = () => {
               </CCol>
               <CCol xs="auto" lg={8}>
                 <CDateRangePicker
-                  style={{ '--cui-date-picker-zindex': '50000', zIndex: 50000 }}
+                  style={{
+                    '--cui-date-picker-zindex': '50000',
+                    'date-picker-zindex': '50000',
+                    zIndex: 50000,
+                  }}
                   className="mb-3"
                   disabled={selectedUser?.status === 'expired' || false}
                   onStartDateChange={(date) =>
