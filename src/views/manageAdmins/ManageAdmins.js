@@ -51,7 +51,7 @@ import { useSelector } from 'react-redux'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { CFormSwitch } from '@coreui/react'
-import { format } from 'date-fns'
+import { addMonths, format } from 'date-fns'
 
 const MySwal = withReactContent(Swal)
 
@@ -287,6 +287,17 @@ const ManageAdmins = () => {
     }
     return toReturn
   }
+
+  // Function to calculate the end date
+  const calculateEndDate = (monthsToAdd) => {
+    const currentDate = new Date()
+    const calculatedDate = addMonths(currentDate, monthsToAdd)
+
+    // Format the date to yyyy-MM-dd
+    const formattedDate = format(calculatedDate, 'yyyy-MM-dd')
+    return formattedDate
+  }
+
   useEffect(() => {
     // const fetchFFusers = () => {
     //   fetch('https://fftopup.store/Flexy/getffusers.php', {
@@ -363,6 +374,11 @@ const ManageAdmins = () => {
                   return {
                     ...prev,
                     membership: `${e.target.value}`,
+                    start_date: format(Date.now(), 'yyyy-MM-dd'),
+                    end_date: () => {
+                      let addedMonths = [1, 3, 6, 12]
+                      return calculateEndDate(addedMonths[e.target.value] || 1)
+                    },
                   }
                 })
               }
@@ -399,6 +415,7 @@ const ManageAdmins = () => {
               </CCol>
               <CCol xs="auto" lg={8}>
                 <CDateRangePicker
+                  style={{ '--cui-date-picker-zindex': '10000' }}
                   className="mb-3"
                   disabled={selectedUser?.status === 'expired' || false}
                   onStartDateChange={(date) =>
@@ -481,6 +498,11 @@ const ManageAdmins = () => {
                   return {
                     ...prev,
                     membership: `${e.target.value}`,
+                    start_date: format(Date.now(), 'yyyy-MM-dd'),
+                    end_date: () => {
+                      let addedMonths = [1, 3, 6, 12]
+                      return calculateEndDate(addedMonths[e.target.value] || 1)
+                    },
                   }
                 })
               }
@@ -500,6 +522,7 @@ const ManageAdmins = () => {
                 ))}
             </CFormSelect>
             <CDateRangePicker
+              style={{ '--cui-date-picker-zindex': '10000' }}
               className="mb-3"
               label="Subscription Period"
               disabled={selectedUser?.status === 'expired' || false}
