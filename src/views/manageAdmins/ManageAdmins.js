@@ -89,7 +89,12 @@ const ManageAdmins = () => {
     {
       key: 'email',
       label: 'Email',
-      _style: { width: '20%', whiteSpace: 'nowrap' },
+      _style: { width: '15%', whiteSpace: 'nowrap' },
+    },
+    {
+      key: 'name',
+      label: 'Client',
+      _style: { width: '10%', whiteSpace: 'nowrap' },
     },
     {
       key: 'start_date',
@@ -109,7 +114,7 @@ const ManageAdmins = () => {
     {
       key: 'membership',
       label: 'Membership',
-      _style: { width: '30%', whiteSpace: 'nowrap' },
+      _style: { width: '25%', whiteSpace: 'nowrap' },
     },
     {
       key: 'action',
@@ -118,40 +123,6 @@ const ManageAdmins = () => {
       sorter: false,
     },
   ]
-  // const rows = [
-  //   {
-  //     id: 1,
-  //     email: 'test@test.com',
-  //     membership: '1 Year Subscription',
-  //     start_date: '01-02-2024',
-  //     end_date: '01-02-2025',
-  //     status: 'active',
-  //   },
-  //   {
-  //     id: 2,
-  //     email: 'test@test.com',
-  //     membership: '1 Year Subscription',
-  //     start_date: '01-02-2024',
-  //     end_date: '01-02-2025',
-  //     status: 'active',
-  //   },
-  //   {
-  //     id: 3,
-  //     email: 'test@test.com',
-  //     membership: '1 Year Subscription',
-  //     start_date: '01-02-2024',
-  //     end_date: '01-02-2025',
-  //     status: 'expired',
-  //   },
-  //   {
-  //     id: 4,
-  //     email: 'test@test.com',
-  //     membership: '1 Year Subscription',
-  //     start_date: '01-02-2024',
-  //     end_date: '01-02-2025',
-  //     status: 'active',
-  //   },
-  // ]
 
   const UsersTableData = UsersData?.subscriptions || null
 
@@ -290,12 +261,13 @@ const ManageAdmins = () => {
 
   // Function to calculate the end date
   const calculateEndDate = (monthsToAdd) => {
-    const currentDate = new Date()
+    const currentDate =
+      (selectedUser?.start_date && new Date(selectedUser?.start_date)) || new Date()
     const calculatedDate = addMonths(currentDate, monthsToAdd)
 
     // Format the date to yyyy-MM-dd
     const formattedDate = format(calculatedDate, 'yyyy-MM-dd')
-    return formattedDate
+    return new String(formattedDate)
   }
 
   useEffect(() => {
@@ -367,6 +339,21 @@ const ManageAdmins = () => {
               disabled
               readOnly
             />
+            <CFormInput
+              onChange={(e) =>
+                setSelectedUser((prev) => {
+                  return {
+                    ...prev,
+                    name: `${e.target.value}`,
+                  }
+                })
+              }
+              className="mb-3"
+              id="name"
+              placeholder="Full Name"
+              label="Client Name"
+              value={selectedUser?.name || ''}
+            />
             <CFormSelect
               defaultValue={selectedUser?.membership}
               onChange={(e) =>
@@ -374,7 +361,7 @@ const ManageAdmins = () => {
                   return {
                     ...prev,
                     membership: `${e.target.value}`,
-                    start_date: format(Date.now(), 'yyyy-MM-dd'),
+                    start_date: selectedUser?.start_date || format(Date.now(), 'yyyy-MM-dd'),
                     end_date: () => {
                       let addedMonths = [1, 3, 6, 12]
                       return calculateEndDate(addedMonths[e.target.value] || 1)
@@ -438,8 +425,8 @@ const ManageAdmins = () => {
                       }
                     })
                   }
-                  endDate={selectedUser?.end_date || ''}
-                  startDate={selectedUser?.start_date || ''}
+                  endDate={selectedUser?.end_date || format(Date.now(), 'yyyy-MM-dd')}
+                  startDate={selectedUser?.start_date || format(Date.now(), 'yyyy-MM-dd')}
                 />
               </CCol>
             </CRow>
@@ -495,6 +482,21 @@ const ManageAdmins = () => {
               label="Email"
               value={selectedUser?.email || ''}
             />
+            <CFormInput
+              onChange={(e) =>
+                setSelectedUser((prev) => {
+                  return {
+                    ...prev,
+                    name: `${e.target.value}`,
+                  }
+                })
+              }
+              className="mb-3"
+              id="name"
+              placeholder="Full Name"
+              label="Client Name"
+              value={selectedUser?.name || ''}
+            />
             <CFormSelect
               defaultValue={selectedUser?.membership}
               onChange={(e) =>
@@ -502,7 +504,7 @@ const ManageAdmins = () => {
                   return {
                     ...prev,
                     membership: `${e.target.value}`,
-                    start_date: format(Date.now(), 'yyyy-MM-dd'),
+                    start_date: selectedUser?.start_date || format(Date.now(), 'yyyy-MM-dd'),
                     end_date: () => {
                       let addedMonths = [1, 3, 6, 12]
                       return calculateEndDate(addedMonths[e.target.value] || 1)
@@ -546,8 +548,10 @@ const ManageAdmins = () => {
                   }
                 })
               }
-              endDate={selectedUser?.end_date || ''}
-              startDate={selectedUser?.start_date || ''}
+              endDate={
+                selectedUser?.end_date || calculateEndDate(0) || format(Date.now(), 'yyyy-MM-dd')
+              }
+              startDate={selectedUser?.start_date || format(Date.now(), 'yyyy-MM-dd')}
             />
 
             <CButton
@@ -617,9 +621,9 @@ const ManageAdmins = () => {
                             className="d-flex align-items-center gap-2"
                             disabled={editUserResult.isLoading}
                             onClick={() => {
-                              console.log(item)
                               setSelectedUser({
                                 email: item.email,
+                                name: item.name,
                                 membership: item.membership,
                                 start_date: item.start_date,
                                 end_date: item.end_date,
